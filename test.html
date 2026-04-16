@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="background:#1a1a1a;color:#fff;font-family:sans-serif;padding:20px;">
+    <p id="status">Cargando...</p>
+    <button onclick="testBridge()" style="padding:8px 16px;margin:8px 0;display:block;">Test Bridge</button>
+    <button onclick="testAlert()" style="padding:8px 16px;margin:8px 0;display:block;">Test Alert en AE</button>
+    <button onclick="testJSX()" style="padding:8px 16px;margin:8px 0;display:block;">Test cargar JSX</button>
+    <pre id="log" style="font-size:11px;color:#aaa;margin-top:12px;"></pre>
+
+<script src="lib/CSInterface.js"></script>
+<script>
+var cs = null;
+var log = document.getElementById("log");
+
+function addLog(msg) {
+    log.textContent += msg + "\n";
+}
+
+try {
+    cs = new CSInterface();
+    document.getElementById("status").textContent = "CSInterface OK";
+    addLog("CSInterface creado OK");
+    addLog("Extension path: " + cs.getSystemPath(SystemPath.EXTENSION));
+} catch(e) {
+    document.getElementById("status").textContent = "ERROR: " + e.message;
+    addLog("ERROR creando CSInterface: " + e.message);
+}
+
+function testBridge() {
+    addLog("--- Test Bridge ---");
+    cs.evalScript('"hola desde JSX"', function(result) {
+        addLog("Resultado: " + result);
+    });
+}
+
+function testAlert() {
+    addLog("--- Test Alert ---");
+    cs.evalScript('alert("CEP funciona")', function(result) {
+        addLog("Alert result: " + result);
+    });
+}
+
+function testJSX() {
+    addLog("--- Test cargar JSX ---");
+    var path = cs.getSystemPath(SystemPath.EXTENSION) + "/jsx/animate.jsx";
+    addLog("Path: " + path);
+    cs.evalScript('$.evalFile("' + path + '")', function(result) {
+        addLog("evalFile result: " + String(result));
+        // ahora probar llamar runAnimation
+        cs.evalScript('typeof runAnimation', function(r2) {
+            addLog("typeof runAnimation: " + r2);
+        });
+    });
+}
+</script>
+</body>
+</html>
